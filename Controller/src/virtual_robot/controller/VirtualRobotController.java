@@ -93,8 +93,13 @@ public class VirtualRobotController {
     private Thread opModeThread = null;
 
     //Virtual Robot Control Engine
-    ScheduledExecutorService executorService = null;
-    public static final double TIMER_INTERVAL_MILLISECONDS = 33;
+    ScheduledExecutorService robotExecutorService = null;
+    public static final double ROBOT_TIMER_INTERVAL_MILLISECONDS = 10;
+
+    //Display Engine
+    ScheduledExecutorService displayExecutorService = null;
+    public static final double DISPLAY_TIMER_INTERVAL_MILLISECONDS = 33;
+
 
     //Telemetry
     private volatile String telemetryText;
@@ -389,15 +394,22 @@ public class VirtualRobotController {
                     updateTelemetryDisplay();
                 }
             };
-            Runnable singleCycle = new Runnable() {
+            Runnable singleRobotCycle = new Runnable() {
                 @Override
                 public void run() {
-                    bot.updateStateAndSensors(TIMER_INTERVAL_MILLISECONDS);
+                    bot.updateStateAndSensors(ROBOT_TIMER_INTERVAL_MILLISECONDS);
+                }
+            };
+            Runnable singleDisplayCycle = new Runnable() {
+                @Override
+                public void run() {
                     Platform.runLater(updateDisplay);
                 }
             };
-            executorService = Executors.newSingleThreadScheduledExecutor();
-            executorService.scheduleAtFixedRate(singleCycle, 0, 33, TimeUnit.MILLISECONDS);
+            robotExecutorService = Executors.newSingleThreadScheduledExecutor();
+            robotExecutorService.scheduleAtFixedRate(singleRobotCycle, 0, (long)ROBOT_TIMER_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
+            displayExecutorService = Executors.newSingleThreadScheduledExecutor();
+            displayExecutorService.scheduleAtFixedRate(singleDisplayCycle, 0, (long)DISPLAY_TIMER_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
             opModeThread.start();
         }
         else if (!opModeStarted){
@@ -408,14 +420,14 @@ public class VirtualRobotController {
             driverButton.setText("INIT");
             opModeInitialized = false;
             opModeStarted = false;
-            //if (opModeThread.isAlive() && !opModeThread.isInterrupted()) opModeThread.interrupt();
-            if (!executorService.isShutdown()) executorService.shutdown();
+            if (!robotExecutorService.isShutdown()) robotExecutorService.shutdown();
+            if (!displayExecutorService.isShutdown()) displayExecutorService.shutdown();
+            if (!opModeThread.isInterrupted()) opModeThread.interrupt();
             try{
                 opModeThread.join(500);
             } catch(InterruptedException exc) {
-                Thread.currentThread().interrupt();
+                System.out.println("OpMode Thread Failed to Terminate.");
             }
-            if (opModeThread.isAlive()) System.out.println("OpMode Thread Failed to Terminate.");
             bot.getHardwareMap().setActive(false);
             bot.powerDownAndReset();
             if (Config.USE_VIRTUAL_GAMEPAD) virtualGamePadController.resetGamePad();
@@ -488,13 +500,13 @@ public class VirtualRobotController {
 
         bot.getHardwareMap().setActive(false);
         bot.powerDownAndReset();
-        if (!executorService.isShutdown()) executorService.shutdown();
+        if (!robotExecutorService.isShutdown()) robotExecutorService.shutdown();
+        if (!displayExecutorService.isShutdown()) displayExecutorService.shutdown();
         opModeInitialized = false;
         opModeStarted = false;
         Platform.runLater(new Runnable() {
             public void run() {
                 driverButton.setText("INIT");
-                //resetGamePad();
                 initializeTelemetryTextArea();
                 cbxConfig.setDisable(false);
                 if (Config.USE_VIRTUAL_GAMEPAD) virtualGamePadController.resetGamePad();

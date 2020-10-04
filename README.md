@@ -92,7 +92,9 @@ LOG OF CHANGES
 
 CHANGES 10/3/2020
     Courtesy of Alan Smith/FTC Team 16072, new robot configuration with mecanum wheels and a turret that rotates
-    and elevates.
+    and elevates. Robot update loop and Display update loop moved to separate timers/threads, and constants added to
+    the Config.java file to set the period for these loops, and also to set the delay between iterations of loops
+    in op modes (i.e, between calls to loop(), init_loop(), and within opModeIsActive()).
 
 CHANGES 9/20/2020
     Added Swerve robot configuration. Each of four swerve units has: a DcMotor for drive, a CR-Servo for steering,

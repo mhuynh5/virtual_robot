@@ -94,11 +94,9 @@ public class VirtualRobotController {
 
     //Virtual Robot Control Engine
     ScheduledExecutorService robotExecutorService = null;
-    public static final double ROBOT_TIMER_INTERVAL_MILLISECONDS = 10;
 
     //Display Engine
     ScheduledExecutorService displayExecutorService = null;
-    public static final double DISPLAY_TIMER_INTERVAL_MILLISECONDS = 33;
 
 
     //Telemetry
@@ -400,7 +398,7 @@ public class VirtualRobotController {
             Runnable singleRobotCycle = new Runnable() {
                 @Override
                 public void run() {
-                    bot.updateStateAndSensors(ROBOT_TIMER_INTERVAL_MILLISECONDS);
+                    bot.updateStateAndSensors(Config.ROBOT_TIMER_INTERVAL_MILLISECONDS);
                 }
             };
             Runnable singleDisplayCycle = new Runnable() {
@@ -410,9 +408,9 @@ public class VirtualRobotController {
                 }
             };
             robotExecutorService = Executors.newSingleThreadScheduledExecutor();
-            robotExecutorService.scheduleAtFixedRate(singleRobotCycle, 0, (long)ROBOT_TIMER_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
+            robotExecutorService.scheduleAtFixedRate(singleRobotCycle, 0, (long) Config.ROBOT_TIMER_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
             displayExecutorService = Executors.newSingleThreadScheduledExecutor();
-            displayExecutorService.scheduleAtFixedRate(singleDisplayCycle, 0, (long)DISPLAY_TIMER_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
+            displayExecutorService.scheduleAtFixedRate(singleDisplayCycle, 0, (long) Config.DISPLAY_TIMER_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
             opModeThread.start();
         }
         else if (!opModeStarted){
@@ -477,7 +475,7 @@ public class VirtualRobotController {
                 opMode.internalPostInitLoop();
 
                 try {
-                    Thread.sleep(0, 1);
+                    Thread.sleep(Config.OPMODE_LOOP_DELAY_MILLISECONDS, Config.OPMODE_LOOP_DELAY_NANOSECONDS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -501,7 +499,7 @@ public class VirtualRobotController {
                 opMode.internalPostLoop();
 
                 try {
-                    Thread.sleep(0, 1);
+                    Thread.sleep(Config.OPMODE_LOOP_DELAY_MILLISECONDS, Config.OPMODE_LOOP_DELAY_NANOSECONDS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }

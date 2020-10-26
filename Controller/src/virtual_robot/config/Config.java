@@ -48,6 +48,6 @@ public class Config {
      * Loop Delay Time for OpModes (i.e., the delay between calls to loop() and init_loop() for a regular op mode,
      * and the delay added in the opModeIsActive() method for a linear op mode.
      */
-    public static final long OPMODE_LOOP_DELAY_MILLISECONDS = 0;
-    public static final int OPMODE_LOOP_DELAY_NANOSECONDS = 1;
+    public static final long OPMODE_LOOP_DELAY_MILLISECONDS = 10;
+    public static final int OPMODE_LOOP_DELAY_NANOSECONDS = 0;
 }
